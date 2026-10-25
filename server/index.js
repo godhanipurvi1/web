@@ -8,6 +8,7 @@ import couponsRoutes from "./src/routes/coupons.js";
 import ridersRoutes from "./src/routes/riders.js";
 import reviewsRoutes from "./src/routes/reviews.js";
 import profileRoutes from "./src/routes/profile.js";
+import menuRoutes from "./src/routes/menu.js";
 
 const PORT = 4000;
 
@@ -21,7 +22,10 @@ app.use(express.json());
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.post("/api/login", login);
 
-// Reads are open; any change needs the admin token.
+// Public customer ordering: no admin login needed.
+app.use("/api/menu", menuRoutes);
+
+// Reads are open; any other change needs the admin token.
 app.use("/api", (req, res, next) => {
   if (req.method === "GET") return next();
   return requireAdmin(req, res, next);
