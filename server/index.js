@@ -17,11 +17,17 @@ const SEED_ORDERS = [
   { id: "ORD-1002", customer: "Ravi", status: "ready", total: 320 },
 ];
 
+const SEED_COUPONS = [
+  { id: "C-1", code: "WELCOME10", percent: 10, minOrder: 300, active: true },
+  { id: "C-2", code: "LUNCH20", percent: 20, minOrder: 500, active: false },
+];
+
 const client = new MongoClient(MONGO_URL);
 await client.connect();
 const db = client.db(DB_NAME);
 const orders = db.collection("orders");
 const products = db.collection("products");
+const coupons = db.collection("coupons");
 
 if ((await products.countDocuments()) === 0) {
   await products.insertMany(SEED_PRODUCTS.map((p) => ({ ...p })));
@@ -30,6 +36,10 @@ if ((await products.countDocuments()) === 0) {
 if ((await orders.countDocuments()) === 0) {
   await orders.insertMany(SEED_ORDERS.map((o) => ({ ...o })));
   console.log("Seeded orders");
+}
+if ((await coupons.countDocuments()) === 0) {
+  await coupons.insertMany(SEED_COUPONS.map((c) => ({ ...c })));
+  console.log("Seeded coupons");
 }
 
 const app = express();
@@ -84,6 +94,41 @@ app.patch("/api/products/:id", async (req, res) => {
   const product = await products.findOne({ id: req.params.id }, hide);
   if (!product) return res.status(404).json({ error: "Product not found" });
   res.json(product);
+});
+
+app.get("/api/coupons", async (req, res) => {
+  res.json(await coupons.find({}, hide).toArray());
+});
+
+app.post("/api/coupons", async (req, res) => {
+  const { code, percent, minOrder } = req.body;
+  if (typeof code !== "string" || !code.trim()) {
+    return res.status(400).json({ error: "Code is required" });
+  }
+  if (typeof percent !== "number" || percent < 1 || percent > 100) {
+    return res.status(400).json({ error: "Percent must be between 1 and 100" });
+  }
+  if (typeof minOrder !== "number" || minOrder < 0) {
+    return res.status(400).json({ error: "Minimum order must be zero or more" });
+  }
+  const coupon = {
+    id: "C-" + Date.now(),
+    code: code.trim().toUpperCase(),
+    percent,
+    minOrder,
+    active: true,
+  };
+  await coupons.insertOne({ ...coupon });
+  res.status(201).json(coupon);
+});
+
+app.patch("/api/coupons/:id", async (req, res) => {
+  const update = {};
+  if (typeof req.body.active === "boolean") update.active = req.body.active;
+  await coupons.updateOne({ id: req.params.id }, { $set: update });
+  const coupon = await coupons.findOne({ id: req.params.id }, hide);
+  if (!coupon) return res.status(404).json({ error: "Coupon not found" });
+  res.json(coupon);
 });
 
 app.listen(PORT, () => console.log("API running on http://localhost:" + PORT));
