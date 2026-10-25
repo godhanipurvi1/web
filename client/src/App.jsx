@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Login from "./components/Login.jsx";
-import { Button } from "./components/ui.jsx";
+import Topbar from "./components/Topbar.jsx";
 import { setToken } from "./lib/api.js";
 import Dashboard from "./pages/Dashboard.jsx";
 import Orders from "./pages/Orders.jsx";
@@ -56,16 +56,13 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <div className="sidefoot">
-          <p>Admin practice build. Changes are saved to MongoDB.</p>
-          <Button onClick={logout}>Log out</Button>
-        </div>
+        <div className="sidefoot">Admin practice build. Changes are saved to MongoDB.</div>
       </aside>
       <main className="content">
-        <header className="pagehead">
-          <h1>{current.label}</h1>
-        </header>
-        <Page />
+        <Topbar title={current.label} onLogout={logout} refreshKey={view} />
+        <div className="page">
+          <Page />
+        </div>
       </main>
     </div>
   );
