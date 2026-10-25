@@ -94,3 +94,5 @@ input { font: inherit; color: var(--ink); }
 .qty { display: inline-flex; align-items: center; gap: 10px; }
 .qty span { min-width: 24px; text-align: center; font-weight: 700; }
 .done { text-align: center; padding: 32px; }
+
+.section-title { font-family: var(--display); font-weight: 800; font-size: 22px; margin: 28px 0 12px; }

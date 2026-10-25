@@ -1,6 +1,46 @@
 import { useEffect, useState } from "react";
 import { getJson, postJson } from "../lib/api.js";
-import { Card, ErrorNotice, Button, RUPEE } from "../components/ui.jsx";
+import { Card, ErrorNotice, Button, StatusPill, RUPEE } from "../components/ui.jsx";
+
+function Tracker() {
+  const [id, setId] = useState("");
+  const [order, setOrder] = useState(null);
+  const [error, setError] = useState("");
+
+  async function track(e) {
+    e.preventDefault();
+    setError("");
+    setOrder(null);
+    try {
+      setOrder(await getJson("/menu/orders/" + encodeURIComponent(id.trim())));
+    } catch (err) {
+      setError("No order found with that ID.");
+    }
+  }
+
+  return (
+    <Card>
+      <form className="addform" onSubmit={track}>
+        <input
+          placeholder="Order ID (e.g. ORD-1792...)"
+          value={id}
+          onChange={(e) => setId(e.target.value)}
+        />
+        <Button>Check status</Button>
+      </form>
+      {error && <p className="muted" style={{ padding: "0 16px 16px" }}>{error}</p>}
+      {order && (
+        <div className="done" style={{ textAlign: "left", paddingTop: 0 }}>
+          <p>
+            <strong>{order.id}</strong> for {order.customer} ?{" "}
+            <StatusPill value={order.status} />
+          </p>
+          <p className="muted">Total: {RUPEE}{order.total}</p>
+        </div>
+      )}
+    </Card>
+  );
+}
 
 export default function Menu() {
   const [dishes, setDishes] = useState([]);
@@ -48,7 +88,7 @@ export default function Menu() {
         <Card>
           <div className="done">
             <h2>Thank you, {placed.customer}!</h2>
-            <p className="muted">Your order {placed.id} is being prepared.</p>
+            <p className="muted">Your order ID is <strong>{placed.id}</strong>. Keep it to check your status.</p>
             <p><strong>Total: {RUPEE}{placed.total}</strong></p>
             <Button onClick={() => setPlaced(null)}>Order again</Button>
           </div>
@@ -98,6 +138,8 @@ export default function Menu() {
           <Button primary>Place order</Button>
         </form>
       </Card>
+      <h2 className="section-title">Track your order</h2>
+      <Tracker />
     </div>
   );
 }

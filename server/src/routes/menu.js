@@ -31,4 +31,14 @@ router.post("/orders", async (req, res) => {
   res.status(201).json(order);
 });
 
+// Public: customers see only the status, not the whole order list.
+router.get("/orders/:id", async (req, res) => {
+  const order = await orders.findOne(
+    { id: req.params.id },
+    { projection: { _id: 0, id: 1, customer: 1, status: 1, total: 1 } }
+  );
+  if (!order) return res.status(404).json({ error: "Order not found" });
+  res.json(order);
+});
+
 export default router;
