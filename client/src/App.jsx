@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Login from "./components/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Orders from "./pages/Orders.jsx";
 import Products from "./pages/Products.jsx";
@@ -24,7 +25,11 @@ const PAGES = [
 ];
 
 export default function App() {
+  const [authed, setAuthed] = useState(false);
   const [view, setView] = useState("dashboard");
+
+  if (!authed) return <Login onLogin={() => setAuthed(true)} />;
+
   const current = PAGES.find((p) => p.id === view);
   const Page = current.Component;
 

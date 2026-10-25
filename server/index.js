@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { seed } from "./src/seed.js";
+import { login, requireAdmin } from "./src/auth.js";
 import ordersRoutes from "./src/routes/orders.js";
 import productsRoutes from "./src/routes/products.js";
 import couponsRoutes from "./src/routes/coupons.js";
@@ -17,6 +18,14 @@ app.use(cors());
 app.use(express.json());
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));
+app.post("/api/login", login);
+
+// Reads are open; any change needs the admin token.
+app.use("/api", (req, res, next) => {
+  if (req.method === "GET") return next();
+  return requireAdmin(req, res, next);
+});
+
 app.use("/api/orders", ordersRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/coupons", couponsRoutes);

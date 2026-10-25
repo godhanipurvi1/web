@@ -64,3 +64,7 @@ button:disabled { opacity: .5; cursor: default; }
 
 .addform { display: flex; flex-wrap: wrap; gap: 10px; padding: 16px; }
 .addform input { height: 36px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); min-width: 160px; }
+
+.login { max-width: 460px; margin: 80px auto; padding: 0 16px; }
+.login-title { font-family: var(--display); font-weight: 800; font-size: 32px; letter-spacing: -0.02em; margin: 0 0 16px; }
+.login-title span { color: var(--brand); }
