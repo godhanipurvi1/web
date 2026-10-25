@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { getJson, patchJson } from "../lib/api.js";
+import { getJson, patchJson, postJson } from "../lib/api.js";
 import { Card, ErrorNotice, StatusPill, Button, RUPEE } from "../components/ui.jsx";
 
 export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [error, setError] = useState("");
+  const [form, setForm] = useState({ customer: "", total: "" });
 
   async function load() {
     try {
@@ -16,8 +17,24 @@ export default function Orders() {
   }
 
   async function markReady(id) {
-    await patchJson("/orders/" + id, { status: "ready" });
-    load();
+    try {
+      await patchJson("/orders/" + id, { status: "ready" });
+      load();
+    } catch (err) {
+      setError("Could not update the order. Are you logged in?");
+    }
+  }
+
+  async function placeOrder(e) {
+    e.preventDefault();
+    try {
+      await postJson("/orders", { customer: form.customer, total: Number(form.total) });
+      setForm({ customer: "", total: "" });
+      setError("");
+      load();
+    } catch (err) {
+      setError("Could not place the order. Check the customer name and total.");
+    }
   }
 
   useEffect(() => { load(); }, []);
@@ -25,6 +42,24 @@ export default function Orders() {
   return (
     <>
       <ErrorNotice message={error} />
+      <Card>
+        <form className="addform" onSubmit={placeOrder}>
+          <input
+            placeholder="Customer name"
+            value={form.customer}
+            onChange={(e) => setForm({ ...form, customer: e.target.value })}
+          />
+          <input
+            placeholder="Total (?)"
+            type="number"
+            min="1"
+            value={form.total}
+            onChange={(e) => setForm({ ...form, total: e.target.value })}
+          />
+          <Button primary>Place order</Button>
+        </form>
+      </Card>
+      <div style={{ height: 16 }} />
       <Card>
         <table className="tbl">
           <thead>
