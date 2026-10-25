@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Login from "./components/Login.jsx";
 import Topbar from "./components/Topbar.jsx";
-import { setToken } from "./lib/api.js";
+import { setToken, logoutRequest } from "./lib/api.js";
 import Dashboard from "./pages/Dashboard.jsx";
 import Orders from "./pages/Orders.jsx";
 import Products from "./pages/Products.jsx";
@@ -27,13 +27,14 @@ const PAGES = [
 ];
 
 export default function App() {
-  const [authed, setAuthed] = useState(false);
+  const [authed, setAuthed] = useState(Boolean(localStorage.getItem("bv_token")));
   const [view, setView] = useState("dashboard");
 
   if (!authed) return <Login onLogin={() => setAuthed(true)} />;
 
   function logout() {
-    setToken(null);
+    logoutRequest();
+  setToken(null);
     setAuthed(false);
     setView("dashboard");
   }

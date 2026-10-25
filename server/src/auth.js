@@ -2,17 +2,16 @@ import { randomUUID, randomBytes, scrypt as scryptCb, timingSafeEqual } from "no
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
-import { admin } from "./db.js";
+import { admin, sessions } from "./db.js";
 
 const scrypt = promisify(scryptCb);
+const SESSION_HOURS = 8;
 
 try {
   process.loadEnvFile(path.join(path.dirname(fileURLToPath(import.meta.url)), "..", ".env"));
 } catch {
   console.warn("No .env file found.");
 }
-
-const tokens = new Set();
 
 async function hashPassword(password) {
   const salt = randomBytes(16).toString("hex");
@@ -46,7 +45,8 @@ export async function login(req, res) {
     return res.status(401).json({ error: "Wrong password" });
   }
   const token = randomUUID();
-  tokens.add(token);
+  const expiresAt = new Date(Date.now() + SESSION_HOURS * 60 * 60 * 1000);
+  await sessions.insertOne({ token, expiresAt });
   res.json({ token });
 }
 
@@ -61,13 +61,27 @@ export async function changePassword(req, res) {
     return res.status(400).json({ error: "New password must be at least 6 characters" });
   }
   await admin.updateOne({ id: "owner" }, { $set: await hashPassword(next) });
+  // Changing the password logs out every existing session.
+  await sessions.deleteMany({});
   res.json({ ok: true });
 }
 
-export function requireAdmin(req, res, next) {
+export async function logout(req, res) {
+  const token = bearerToken(req);
+  if (token) await sessions.deleteOne({ token });
+  res.json({ ok: true });
+}
+
+function bearerToken(req) {
   const header = req.headers.authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : "";
-  if (!tokens.has(token)) {
+  return header.startsWith("Bearer ") ? header.slice(7) : "";
+}
+
+export async function requireAdmin(req, res, next) {
+  const token = bearerToken(req);
+  const session = token ? await sessions.findOne({ token }) : null;
+  if (!session || session.expiresAt < new Date()) {
+    if (session) await sessions.deleteOne({ token });
     return res.status(401).json({ error: "Admin login required" });
   }
   next();

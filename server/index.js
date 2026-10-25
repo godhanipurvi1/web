@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { seed } from "./src/seed.js";
-import { ensureAdmin, login, changePassword, requireAdmin } from "./src/auth.js";
+import { ensureAdmin, login, logout, changePassword, requireAdmin } from "./src/auth.js";
 import ordersRoutes from "./src/routes/orders.js";
 import productsRoutes from "./src/routes/products.js";
 import couponsRoutes from "./src/routes/coupons.js";
@@ -21,6 +21,7 @@ app.use(express.json());
 
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 app.post("/api/login", login);
+app.post("/api/logout", logout);
 
 // Public customer ordering: no admin login needed.
 app.use("/api/menu", menuRoutes);

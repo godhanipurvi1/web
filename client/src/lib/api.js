@@ -1,7 +1,9 @@
-let token = null;
+let token = localStorage.getItem("bv_token");
 
 export function setToken(value) {
   token = value;
+  if (value) localStorage.setItem("bv_token", value);
+  else localStorage.removeItem("bv_token");
 }
 
 function headers() {
@@ -34,6 +36,10 @@ export async function patchJson(path, body) {
   });
   if (!res.ok) throw new Error("Request failed: " + res.status);
   return res.json();
+}
+
+export function logoutRequest() {
+  return fetch("/api/logout", { method: "POST", headers: headers() }).catch(function () {});
 }
 
 export async function login(password) {

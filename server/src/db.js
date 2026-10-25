@@ -15,3 +15,4 @@ export const riders = db.collection("riders");
 export const reviews = db.collection("reviews");
 export const profile = db.collection("profile");
 export const admin = db.collection("admin");
+export const sessions = db.collection("sessions");
