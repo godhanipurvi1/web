@@ -22,12 +22,19 @@ const SEED_COUPONS = [
   { id: "C-2", code: "LUNCH20", percent: 20, minOrder: 500, active: false },
 ];
 
+const SEED_RIDERS = [
+  { id: "R-1", name: "Amit", onDuty: true },
+  { id: "R-2", name: "Kiran", onDuty: false },
+  { id: "R-3", name: "Meera", onDuty: true },
+];
+
 const client = new MongoClient(MONGO_URL);
 await client.connect();
 const db = client.db(DB_NAME);
 const orders = db.collection("orders");
 const products = db.collection("products");
 const coupons = db.collection("coupons");
+const riders = db.collection("riders");
 
 if ((await products.countDocuments()) === 0) {
   await products.insertMany(SEED_PRODUCTS.map((p) => ({ ...p })));
@@ -40,6 +47,10 @@ if ((await orders.countDocuments()) === 0) {
 if ((await coupons.countDocuments()) === 0) {
   await coupons.insertMany(SEED_COUPONS.map((c) => ({ ...c })));
   console.log("Seeded coupons");
+}
+if ((await riders.countDocuments()) === 0) {
+  await riders.insertMany(SEED_RIDERS.map((r) => ({ ...r })));
+  console.log("Seeded riders");
 }
 
 const app = express();
@@ -129,6 +140,19 @@ app.patch("/api/coupons/:id", async (req, res) => {
   const coupon = await coupons.findOne({ id: req.params.id }, hide);
   if (!coupon) return res.status(404).json({ error: "Coupon not found" });
   res.json(coupon);
+});
+
+app.get("/api/riders", async (req, res) => {
+  res.json(await riders.find({}, hide).toArray());
+});
+
+app.patch("/api/riders/:id", async (req, res) => {
+  const update = {};
+  if (typeof req.body.onDuty === "boolean") update.onDuty = req.body.onDuty;
+  await riders.updateOne({ id: req.params.id }, { $set: update });
+  const rider = await riders.findOne({ id: req.params.id }, hide);
+  if (!rider) return res.status(404).json({ error: "Rider not found" });
+  res.json(rider);
 });
 
 app.listen(PORT, () => console.log("API running on http://localhost:" + PORT));
