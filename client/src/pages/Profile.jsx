@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getJson, patchJson } from "../lib/api.js";
 import { Card, ErrorNotice, StatusPill, Button } from "../components/ui.jsx";
+import ChangePassword from "../components/ChangePassword.jsx";
 
 export default function Profile() {
   const [profile, setProfile] = useState(null);
@@ -79,6 +80,8 @@ export default function Profile() {
           {message && <span className="muted">{message}</span>}
         </form>
       </Card>
+      <div style={{ height: 16 }} />
+      <ChangePassword />
     </>
   );
 }

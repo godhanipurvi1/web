@@ -1,7 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { seed } from "./src/seed.js";
-import { login, requireAdmin } from "./src/auth.js";
+import { ensureAdmin, login, changePassword, requireAdmin } from "./src/auth.js";
 import ordersRoutes from "./src/routes/orders.js";
 import productsRoutes from "./src/routes/products.js";
 import couponsRoutes from "./src/routes/coupons.js";
@@ -12,6 +12,7 @@ import profileRoutes from "./src/routes/profile.js";
 const PORT = 4000;
 
 await seed();
+await ensureAdmin();
 
 const app = express();
 app.use(cors());
@@ -26,6 +27,7 @@ app.use("/api", (req, res, next) => {
   return requireAdmin(req, res, next);
 });
 
+app.post("/api/password", changePassword);
 app.use("/api/orders", ordersRoutes);
 app.use("/api/products", productsRoutes);
 app.use("/api/coupons", couponsRoutes);
