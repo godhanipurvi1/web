@@ -1,3 +1,5 @@
+import { PlaceholderPage } from "../components/ui.jsx";
+
 export default function Payments() {
-  return <p>Payments page is coming soon.</p>;
+  return <PlaceholderPage name="Payments" />;
 }

@@ -1,3 +1,5 @@
+import { PlaceholderPage } from "../components/ui.jsx";
+
 export default function Dashboard() {
-  return <p>Dashboard page is coming soon.</p>;
+  return <PlaceholderPage name="Dashboard" />;
 }

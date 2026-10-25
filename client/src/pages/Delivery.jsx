@@ -1,3 +1,5 @@
+import { PlaceholderPage } from "../components/ui.jsx";
+
 export default function Delivery() {
-  return <p>Delivery page is coming soon.</p>;
+  return <PlaceholderPage name="Delivery" />;
 }

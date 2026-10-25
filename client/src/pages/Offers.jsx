@@ -1,3 +1,5 @@
+import { PlaceholderPage } from "../components/ui.jsx";
+
 export default function Offers() {
-  return <p>Offers page is coming soon.</p>;
+  return <PlaceholderPage name="Offers" />;
 }

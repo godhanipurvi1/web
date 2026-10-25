@@ -1,3 +1,5 @@
+import { PlaceholderPage } from "../components/ui.jsx";
+
 export default function Analytics() {
-  return <p>Analytics page is coming soon.</p>;
+  return <PlaceholderPage name="Analytics" />;
 }

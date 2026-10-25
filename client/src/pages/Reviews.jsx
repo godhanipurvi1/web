@@ -1,3 +1,5 @@
+import { PlaceholderPage } from "../components/ui.jsx";
+
 export default function Reviews() {
-  return <p>Reviews page is coming soon.</p>;
+  return <PlaceholderPage name="Reviews" />;
 }

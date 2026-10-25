@@ -109,3 +109,6 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+.page-note { color: var(--muted); }
+.page-note p { margin: 0; padding: 24px; }

@@ -1,3 +1,5 @@
+import { PlaceholderPage } from "../components/ui.jsx";
+
 export default function Profile() {
-  return <p>Profile page is coming soon.</p>;
+  return <PlaceholderPage name="Profile" />;
 }
