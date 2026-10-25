@@ -1,5 +1,7 @@
 import { useState } from "react";
 import Login from "./components/Login.jsx";
+import { Button } from "./components/ui.jsx";
+import { setToken } from "./lib/api.js";
 import Dashboard from "./pages/Dashboard.jsx";
 import Orders from "./pages/Orders.jsx";
 import Products from "./pages/Products.jsx";
@@ -30,6 +32,12 @@ export default function App() {
 
   if (!authed) return <Login onLogin={() => setAuthed(true)} />;
 
+  function logout() {
+    setToken(null);
+    setAuthed(false);
+    setView("dashboard");
+  }
+
   const current = PAGES.find((p) => p.id === view);
   const Page = current.Component;
 
@@ -48,7 +56,10 @@ export default function App() {
             </button>
           ))}
         </nav>
-        <div className="sidefoot">Admin practice build. Changes are saved to MongoDB.</div>
+        <div className="sidefoot">
+          <p>Admin practice build. Changes are saved to MongoDB.</p>
+          <Button onClick={logout}>Log out</Button>
+        </div>
       </aside>
       <main className="content">
         <header className="pagehead">
