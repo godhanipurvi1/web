@@ -28,6 +28,12 @@ const SEED_RIDERS = [
   { id: "R-3", name: "Meera", onDuty: true },
 ];
 
+const SEED_REVIEWS = [
+  { id: "V-1", customer: "Asha", dish: "Paneer Tikka", rating: 5, comment: "Smoky and perfectly spiced.", visible: true },
+  { id: "V-2", customer: "Ravi", dish: "Veg Biryani", rating: 3, comment: "Good flavour, rice was a bit dry.", visible: true },
+  { id: "V-3", customer: "Asha", dish: "Gulab Jamun", rating: 4, comment: "Sweet and soft.", visible: false },
+];
+
 const client = new MongoClient(MONGO_URL);
 await client.connect();
 const db = client.db(DB_NAME);
@@ -35,6 +41,7 @@ const orders = db.collection("orders");
 const products = db.collection("products");
 const coupons = db.collection("coupons");
 const riders = db.collection("riders");
+const reviews = db.collection("reviews");
 
 if ((await products.countDocuments()) === 0) {
   await products.insertMany(SEED_PRODUCTS.map((p) => ({ ...p })));
@@ -51,6 +58,10 @@ if ((await coupons.countDocuments()) === 0) {
 if ((await riders.countDocuments()) === 0) {
   await riders.insertMany(SEED_RIDERS.map((r) => ({ ...r })));
   console.log("Seeded riders");
+}
+if ((await reviews.countDocuments()) === 0) {
+  await reviews.insertMany(SEED_REVIEWS.map((v) => ({ ...v })));
+  console.log("Seeded reviews");
 }
 
 const app = express();
@@ -153,6 +164,19 @@ app.patch("/api/riders/:id", async (req, res) => {
   const rider = await riders.findOne({ id: req.params.id }, hide);
   if (!rider) return res.status(404).json({ error: "Rider not found" });
   res.json(rider);
+});
+
+app.get("/api/reviews", async (req, res) => {
+  res.json(await reviews.find({}, hide).toArray());
+});
+
+app.patch("/api/reviews/:id", async (req, res) => {
+  const update = {};
+  if (typeof req.body.visible === "boolean") update.visible = req.body.visible;
+  await reviews.updateOne({ id: req.params.id }, { $set: update });
+  const review = await reviews.findOne({ id: req.params.id }, hide);
+  if (!review) return res.status(404).json({ error: "Review not found" });
+  res.json(review);
 });
 
 app.listen(PORT, () => console.log("API running on http://localhost:" + PORT));
