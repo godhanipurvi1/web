@@ -5,8 +5,8 @@
   --display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
   --body: "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
+@media all {
+  :root[data-theme="dark"] {
     --bg: #100e0c; --surface: #1b1815; --surface-2: #241f1a; --ink: #f4efe9; --muted: #a79e94; --line: #2f2923;
     --brand: #ff7a33; --brand-ink: #1a0d03; --brand-soft: #3a2314; --brand-text: #ffa270;
     --ok: #55c58a; --ok-soft: #173325; --warn: #e7b25a; --warn-soft: #382a10; --bad: #f08a83; --bad-soft: #3b1b19;
@@ -96,3 +96,24 @@ input { font: inherit; color: var(--ink); }
 .done { text-align: center; padding: 32px; }
 
 .section-title { font-family: var(--display); font-weight: 800; font-size: 22px; margin: 28px 0 12px; }
+
+
+/* Design top bar */
+.app { min-height: 100vh; }
+.topbar { top: 0; z-index: 50; height: 66px; padding: 0 24px; flex-wrap: nowrap; }
+.topbar-left { display: flex; align-items: center; gap: 10px; }
+.topbar .logo { padding: 0; }
+.topbar-right { gap: 10px; }
+.tag { font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 4px 8px; border-radius: 6px; background: var(--brand-soft); color: var(--brand-text); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--brand); color: var(--brand-ink); display: grid; place-items: center; font-weight: 700; font-size: 14px; }
+.shell { min-height: calc(100vh - 66px); }
+.side { position: sticky; top: 66px; align-self: start; height: calc(100vh - 66px); overflow-y: auto; }
+.page-title { font-family: var(--display); font-weight: 800; font-size: 26px; letter-spacing: -0.02em; margin: 0 0 18px; }
+@media (max-width: 760px) { .topbar { padding: 0 16px; } .side { position: static; height: auto; } }
+
+/* Design sidebar */
+.ic { width: 20px; height: 20px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+.nav { gap: 16px; }
+.navgroup { display: grid; gap: 2px; }
+.navgroup h4 { margin: 0 0 4px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); font-weight: 700; }
+.navbtn { display: flex; align-items: center; gap: 14px; height: 46px; }

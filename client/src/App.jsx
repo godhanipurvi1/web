@@ -12,6 +12,7 @@ import Delivery from "./pages/Delivery.jsx";
 import Analytics from "./pages/Analytics.jsx";
 import Reviews from "./pages/Reviews.jsx";
 import Profile from "./pages/Profile.jsx";
+import Icon from "./components/Icon.jsx";
 
 const PAGES = [
   { id: "dashboard", label: "Dashboard", Component: Dashboard },
@@ -26,6 +27,11 @@ const PAGES = [
   { id: "profile", label: "My profile", Component: Profile },
 ];
 
+const GROUPS = [
+  { title: "Overview", items: [["dashboard", "grid"]] },
+  { title: "Management", items: [["orders", "receipt"], ["products", "fork"], ["offers", "tag"], ["customers", "users"], ["payments", "card"], ["delivery", "bike"]] },
+  { title: "System", items: [["analytics", "chart"], ["reviews", "star"], ["profile", "user"]] },
+];
 export default function App() {
   const [authed, setAuthed] = useState(Boolean(localStorage.getItem("bv_token")));
   const [view, setView] = useState("dashboard");
@@ -43,28 +49,41 @@ export default function App() {
   const Page = current.Component;
 
   return (
-    <div className="shell">
+    <div className="app">
+      <Topbar onLogout={logout} refreshKey={view} />
+      <div className="shell">
       <aside className="side">
-        <div className="logo">Bite<b>Verse</b></div>
+        
         <nav className="nav">
-          {PAGES.map((p) => (
-            <button
-              key={p.id}
-              className={"navbtn" + (view === p.id ? " on" : "")}
-              onClick={() => setView(p.id)}
-            >
-              {p.label}
-            </button>
+          {GROUPS.map((g) => (
+            <div key={g.title} className="navgroup">
+              <h4>{g.title}</h4>
+              {g.items.map(([id, ic]) => {
+                const p = PAGES.find((x) => x.id === id);
+                return (
+                  <button
+                    key={id}
+                    className={"navbtn" + (view === id ? " on" : "")}
+                    onClick={() => setView(id)}
+                  >
+                    <Icon name={ic} />
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
           ))}
         </nav>
         <div className="sidefoot">Admin practice build. Changes are saved to MongoDB.</div>
       </aside>
       <main className="content">
-        <Topbar title={current.label} onLogout={logout} refreshKey={view} />
+        
         <div className="page">
+          <h1 className="page-title">{current.label}</h1>
           <Page />
         </div>
       </main>
+      </div>
     </div>
   );
 }
