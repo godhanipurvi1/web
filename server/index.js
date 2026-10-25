@@ -57,6 +57,25 @@ app.get("/api/products", async (req, res) => {
   res.json(await products.find({}, hide).toArray());
 });
 
+app.post("/api/products", async (req, res) => {
+  const { name, category, price } = req.body;
+  if (typeof name !== "string" || !name.trim()) {
+    return res.status(400).json({ error: "Name is required" });
+  }
+  if (typeof price !== "number" || price <= 0) {
+    return res.status(400).json({ error: "Price must be a positive number" });
+  }
+  const product = {
+    id: "P-" + Date.now(),
+    name: name.trim(),
+    category: typeof category === "string" && category.trim() ? category.trim() : "Other",
+    price,
+    available: true,
+  };
+  await products.insertOne({ ...product });
+  res.status(201).json(product);
+});
+
 app.patch("/api/products/:id", async (req, res) => {
   const update = {};
   if (typeof req.body.available === "boolean") update.available = req.body.available;
