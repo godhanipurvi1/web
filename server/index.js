@@ -34,6 +34,14 @@ const SEED_REVIEWS = [
   { id: "V-3", customer: "Asha", dish: "Gulab Jamun", rating: 4, comment: "Sweet and soft.", visible: false },
 ];
 
+const SEED_PROFILE = {
+  id: "restaurant",
+  name: "Practice Kitchen",
+  address: "Example Street, Your City",
+  phone: "+91 90000 00000",
+  open: true,
+};
+
 const client = new MongoClient(MONGO_URL);
 await client.connect();
 const db = client.db(DB_NAME);
@@ -42,6 +50,7 @@ const products = db.collection("products");
 const coupons = db.collection("coupons");
 const riders = db.collection("riders");
 const reviews = db.collection("reviews");
+const profile = db.collection("profile");
 
 if ((await products.countDocuments()) === 0) {
   await products.insertMany(SEED_PRODUCTS.map((p) => ({ ...p })));
@@ -62,6 +71,10 @@ if ((await riders.countDocuments()) === 0) {
 if ((await reviews.countDocuments()) === 0) {
   await reviews.insertMany(SEED_REVIEWS.map((v) => ({ ...v })));
   console.log("Seeded reviews");
+}
+if ((await profile.countDocuments()) === 0) {
+  await profile.insertOne({ ...SEED_PROFILE });
+  console.log("Seeded profile");
 }
 
 const app = express();
@@ -177,6 +190,20 @@ app.patch("/api/reviews/:id", async (req, res) => {
   const review = await reviews.findOne({ id: req.params.id }, hide);
   if (!review) return res.status(404).json({ error: "Review not found" });
   res.json(review);
+});
+
+app.get("/api/profile", async (req, res) => {
+  res.json(await profile.findOne({ id: "restaurant" }, hide));
+});
+
+app.patch("/api/profile", async (req, res) => {
+  const update = {};
+  for (const key of ["name", "address", "phone"]) {
+    if (typeof req.body[key] === "string") update[key] = req.body[key].trim();
+  }
+  if (typeof req.body.open === "boolean") update.open = req.body.open;
+  await profile.updateOne({ id: "restaurant" }, { $set: update });
+  res.json(await profile.findOne({ id: "restaurant" }, hide));
 });
 
 app.listen(PORT, () => console.log("API running on http://localhost:" + PORT));
